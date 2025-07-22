@@ -104,6 +104,7 @@ from .bcs import (
     RollerBCXY,
     RollerBCYZ,
     RollerBCXZ,
+    _SpecificFix,
 )
 
 from .ics import (
@@ -206,6 +207,7 @@ __all__ = [
     "RollerBCXY",
     "RollerBCYZ",
     "RollerBCXZ",
+    "_SpecificFix",
     "_InitialCondition",
     "InitialTemperatureField",
     "InitialStressField",

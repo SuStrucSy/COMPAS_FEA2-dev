@@ -1066,9 +1066,9 @@ class Model(FEAData):
         """
         types = {
             "fix": "FixedBC",
-            "fixXX": "FixedBCXX",
-            "fixYY": "FixedBCYY",
-            "fixZZ": "FixedBCZZ",
+            "fixXX": "ClampBCXX",
+            "fixYY": "ClampBCYY",
+            "fixZZ": "ClampBCZZ",
             "pin": "PinnedBC",
             "rollerX": "RollerBCX",
             "rollerY": "RollerBCY",
@@ -1076,6 +1076,7 @@ class Model(FEAData):
             "rollerXY": "RollerBCXY",
             "rollerYZ": "RollerBCYZ",
             "rollerXZ": "RollerBCXZ",
+            "_specific":"_SpecificFix"
         }
         m = importlib.import_module("compas_fea2.model.bcs")
         bc = getattr(m, types[bc_type])()
@@ -1124,7 +1125,7 @@ class Model(FEAData):
             [axes of the boundary condition, by default 'global'
 
         """
-        return self._add_bc_type("clampXX", nodes, axes)
+        return self._add_bc_type("fixXX", nodes, axes)
 
     def add_clampYY_bc(self, nodes, axes="global"):
         """Add a fixed boundary condition free about YY type to some nodes in a part.
@@ -1139,7 +1140,7 @@ class Model(FEAData):
             [axes of the boundary condition, by default 'global'
 
         """
-        return self._add_bc_type("clampYY", nodes, axes)
+        return self._add_bc_type("fixYY", nodes, axes)
 
     def add_clampZZ_bc(self, nodes, axes="global"):
         """Add a fixed boundary condition free about ZZ type to some nodes in a part.
@@ -1154,7 +1155,7 @@ class Model(FEAData):
             [axes of the boundary condition, by default 'global'
 
         """
-        return self._add_bc_type("clampZZ", nodes, axes)
+        return self._add_bc_type("fixZZ", nodes, axes)
 
     def add_rollerX_bc(self, nodes, axes="global"):
         """Add a roller free on X boundary condition type to some nodes in a part.
@@ -1245,6 +1246,26 @@ class Model(FEAData):
 
         """
         return self._add_bc_type("rollerYZ", nodes, axes)
+    
+    def add_specific_bc(self, nodes, axes="global", **kwargs):
+        """Add a specific boundary condition to the nodes in a part.
+
+        Parameters
+        ----------
+        nodes : list[:class:`compas_fea2.model.Node`] or :class:`compas_fea2.model.NodesGroup`
+            List or Group with the nodes where the boundary condition is assigned.
+        axes : str, optional
+            Axes of the boundary condition, by default 'global'.
+        **kwargs : dict
+            Additional keyword arguments for the specific boundary condition.
+
+        Returns
+        -------
+        :class:`compas_fea2.model._BoundaryCondition`
+
+        """
+        return self._add_bc_type("_specific", nodes, axes)
+
 
     def remove_bcs(self, nodes):
         """Release a node previously restrained.

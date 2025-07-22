@@ -115,7 +115,7 @@ class Step(FEAData):
                 for node, load in field.node_load:
                     factored_load = factor * load
 
-                    node.loads.setdefault(self, {}).setdefault(combination, {})[field] = factored_load
+                    node._loads.setdefault(self, {}).setdefault(combination, {})[field] = factored_load
                     if node._total_load:
                         node._total_load += factored_load
                     else:

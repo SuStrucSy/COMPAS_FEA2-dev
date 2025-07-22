@@ -301,3 +301,18 @@ class RollerBCXZ(PinnedBC):
         super().__init__(**kwargs)
         self._x = False
         self._z = False
+
+class _SpecificFix(_BoundaryCondition):
+    """A specific nodal displacement boundary condition."""
+
+    __doc__ += docs
+
+    def __init__(self, x: bool = False, y: bool = False, z: bool = True, xx: bool = True, yy: bool = True, zz: bool = True, **kwargs):
+        super().__init__(**kwargs)
+        self._x = x
+        self._y = y
+        self._z = z
+        self._xx = xx
+        self._yy = yy
+        self._zz = zz
+    

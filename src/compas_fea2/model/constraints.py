@@ -119,6 +119,9 @@ class _SurfaceConstraint(_Constraint):
     def __from_data__(cls, data):
         return cls(**data)
 
+class FixConstraint(_Constraint):
+    """Fixed constraint"""
+
 
 class TieConstraint(_SurfaceConstraint):
     """Tie constraint between two surfaces."""

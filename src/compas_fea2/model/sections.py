@@ -91,7 +91,7 @@ material : {self.material!r}
 
     @material.setter
     def material(self, value: "_Material"):  # noqa: F821
-        from compas_fea2.model.materials import _Material
+        from compas_fea2.model.materials.material import _Material
 
         if value:
             if not isinstance(value, _Material):
@@ -148,7 +148,7 @@ mass     : {self.mass}
         return cls(mass=data["mass"], **data)
 
 
-class SpringSection(FEAData):
+class SpringSection(_Section):
     """
     Section for use with spring elements.
 
@@ -313,7 +313,7 @@ class BeamSection(_Section):
         The shape of the section.
     """
 
-    def __init__(self, *, A: float, Ixx: float, Iyy: float, Ixy: float, Avx: float, Avy: float, J: float, material: "_Material", **kwargs):  # noqa: F821
+    def __init__(self, *, A: float, Ixx: float, Iyy: float, Ixy: float, Avx: float, Avy: float, J: float, material: "_Material", shape=None, **kwargs):  # noqa: F821
         super().__init__(material=material, **kwargs)
         self.A = A
         self.Ixx = Ixx
@@ -322,6 +322,8 @@ class BeamSection(_Section):
         self.Avx = Avx
         self.Avy = Avy
         self.J = J
+        self.material = material
+        self._shape = shape
 
     @property
     def __data__(self):
@@ -371,6 +373,18 @@ gw  : {self.gw}
     @property
     def shape(self):
         return self._shape
+    
+    @shape.setter
+    def shape(self, shape):
+        """
+        Set the shape of the section.
+
+        Parameters
+        ----------
+        shape : :class:`compas_fea2.model.shapes.Shape`
+            The shape to set for the section.
+        """
+        self._shape = shape
 
     def plot(self):
         self.shape.plot()
@@ -769,6 +783,7 @@ class GenericBeamSection(BeamSection):
     def __init__(self, A: float, Ixx: float, Iyy: float, Ixy: float, Avx: float, Avy: float, J: float, g0: float, gw: float, material: "_Material", **kwargs):  # noqa: F821
         super().__init__(A=A, Ixx=Ixx, Iyy=Iyy, Ixy=Ixy, Avx=Avx, Avy=Avy, J=J, g0=g0, gw=gw, material=material, **kwargs)
         self._shape = Circle(radius=sqrt(A / pi))
+        self.A = A
 
     @property
     def __data__(self):
@@ -1636,6 +1651,10 @@ class RectangularSection(BeamSection):
         self._shape = Rectangle(w, h)
         super().__init__(**from_shape(self._shape, material, **kwargs))
         self.k = 5 / 6
+    
+    @property
+    def shape(self):
+        return self._shape
 
     @property
     def __data__(self):

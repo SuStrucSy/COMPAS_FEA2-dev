@@ -79,7 +79,7 @@ class _Element(FEAData):
         super().__init__(**kwargs)
         self._part_key = None
         self._nodes = self._check_nodes(nodes)
-        self._registration = nodes[0]._registration
+        self._registration = self._nodes[0]._registration
         self._section = section
         self._implementation = implementation
         self._frame = None
@@ -164,8 +164,14 @@ class _Element(FEAData):
         self._on_boundary = value
 
     def _check_nodes(self, nodes: List["Node"]) -> List["Node"]:  # noqa: F821
-        if len(set([node._registration for node in nodes])) != 1:
-            raise ValueError("At least one of node is registered to a different part or not registered")
+        try:
+            if len(set([node._registration for node in nodes])) != 1:
+                raise ValueError("At least one of node is registered to a different part or not registered")
+        except AttributeError:
+            _nodes = nodes[0]
+            if len(set([node._registration for node in _nodes])) != 1:
+                raise ValueError("At least one of node is registered to a different part or not registered")
+            return _nodes
         return nodes
 
     @property
@@ -225,8 +231,8 @@ class MassElement(_Element):
 class _Element0D(_Element):
     """Element with 1 dimension."""
 
-    def __init__(self, nodes: List["Node"], frame: Frame, implementation: Optional[str] = None, rigid: bool = False, **kwargs):  # noqa: F821
-        super().__init__(nodes, section=None, implementation=implementation, rigid=rigid, **kwargs)
+    def __init__(self, nodes: List["Node"], section, frame: Frame, implementation: Optional[str] = None, rigid: bool = False, **kwargs):  # noqa: F821
+        super().__init__(nodes, section=section, implementation=implementation, rigid=rigid, **kwargs)
         self._frame = frame
         self._ndim = 0
 
@@ -249,7 +255,6 @@ class SpringElement(_Element0D):
 
     def __init__(self, nodes: List["Node"], section: "_Section", implementation: Optional[str] = None, rigid: bool = False, **kwargs):  # noqa: F821
         super().__init__(nodes, section=section, implementation=implementation, rigid=rigid, **kwargs)
-
 
 class LinkElement(_Element0D):
     """A 0D link element.
@@ -318,7 +323,7 @@ class _Element1D(_Element):
     @property
     def outermesh(self) -> Mesh:
         self._frame.point = self.nodes[0].point
-        self._shape_i = self.section._shape.oriented(self._frame, check_planarity=False)
+        self._shape_i = self.section.shape.oriented(self._frame, check_planarity=False)
         self._shape_j = self._shape_i.translated(Vector.from_start_end(self.nodes[0].point, self.nodes[-1].point), check_planarity=False)
         p = self._shape_i.points
         n = len(p)
